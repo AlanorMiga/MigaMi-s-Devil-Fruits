@@ -1,0 +1,45 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "mdf:fruit/skeleton/bone"
+	},
+	"elements": [
+		{
+			"name": "Bone",
+			"from": [6, 0, 7],
+			"to": [10, 2, 9],
+			"faces": {
+				"north": {"uv": [8, 11, 12, 13], "texture": "#1"},
+				"east": {"uv": [6, 11, 8, 13], "texture": "#1"},
+				"south": {"uv": [2, 11, 6, 13], "texture": "#1"},
+				"west": {"uv": [0, 11, 2, 13], "texture": "#1"},
+				"up": {"uv": [0, 13, 4, 15], "texture": "#1"},
+				"down": {"uv": [6, 9, 10, 11], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Bone",
+			"from": [6, 10, 7],
+			"to": [10, 12, 9],
+			"faces": {
+				"north": {"uv": [8, 11, 12, 13], "texture": "#1"},
+				"east": {"uv": [6, 11, 8, 13], "texture": "#1"},
+				"south": {"uv": [2, 11, 6, 13], "texture": "#1"},
+				"west": {"uv": [0, 11, 2, 13], "texture": "#1"},
+				"up": {"uv": [2, 9, 6, 11], "texture": "#1"},
+				"down": {"uv": [0, 13, 4, 15], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Bone",
+			"from": [7, 2, 7.5],
+			"to": [9, 10, 8.5],
+			"faces": {
+				"north": {"uv": [1, 1, 3, 9], "texture": "#1"},
+				"east": {"uv": [3, 1, 4, 9], "texture": "#1"},
+				"south": {"uv": [4, 1, 6, 9], "texture": "#1"},
+				"west": {"uv": [0, 1, 1, 9], "texture": "#1"}
+			}
+		}
+	]
+}
