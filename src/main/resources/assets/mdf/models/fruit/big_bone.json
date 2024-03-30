@@ -1,0 +1,49 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "mdf:fruit/skeleton/bone",
+		"particle": "mdf:fruit/skeleton/bone"
+	},
+	"elements": [
+		{
+			"name": "Bone",
+			"from": [5.5, 26.5, 6.75],
+			"to": [10.5, 29, 9.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0.5, 0, -0.25]},
+			"faces": {
+				"north": {"uv": [3, 0, 7, 2], "texture": "#0"},
+				"east": {"uv": [3, 2, 5, 4], "texture": "#0"},
+				"south": {"uv": [3, 0, 7, 2], "texture": "#0"},
+				"west": {"uv": [3, 2, 5, 4], "texture": "#0"},
+				"up": {"uv": [7, 0, 11, 2], "texture": "#0"},
+				"down": {"uv": [3, 6, 7, 8], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Bone",
+			"from": [5.5, 0, 6.75],
+			"to": [10.5, 2.5, 9.25],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0.5, 0, -0.25]},
+			"faces": {
+				"north": {"uv": [3, 0, 7, 2], "texture": "#0"},
+				"east": {"uv": [3, 2, 5, 4], "texture": "#0"},
+				"south": {"uv": [3, 0, 7, 2], "texture": "#0"},
+				"west": {"uv": [3, 2, 5, 4], "texture": "#0"},
+				"up": {"uv": [7, 0, 11, 2], "texture": "#0"},
+				"down": {"uv": [3, 6, 7, 8], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Bone",
+			"from": [6.75, 2.5, 7.25],
+			"to": [9.25, 26.5, 8.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-0.25, 0, -0.25]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 8], "texture": "#0"},
+				"east": {"uv": [2, 0, 3, 8], "texture": "#0"},
+				"south": {"uv": [0, 0, 2, 8], "texture": "#0"},
+				"west": {"uv": [2, 0, 3, 8], "texture": "#0"}
+			}
+		}
+	]
+}
