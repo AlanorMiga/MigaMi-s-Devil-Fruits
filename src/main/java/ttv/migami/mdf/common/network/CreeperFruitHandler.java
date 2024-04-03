@@ -29,9 +29,10 @@ public class CreeperFruitHandler
                     actionHeavySlowdown(pPlayer);
                     removeCamouflage(pPlayer);
                     explodeSelf(pPlayer);
+                    weakness(pPlayer);
                     break;
                 case 2:
-                    blockPos = rayTrace(pPlayer, 32.0D);
+                    blockPos = rayTrace(pPlayer, 16.0D);
                     actionSlowdown(pPlayer);
                     explode(pPlayer, blockPos);
                     break;
@@ -68,9 +69,14 @@ public class CreeperFruitHandler
         }
     }
 
+    private static void weakness(Player pPlayer) {
+        pPlayer.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, false, true));
+        pPlayer.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 0, false, true));
+    }
+
     private static void camouflage(Player pPlayer) {
-        pPlayer.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 2, false, true));
-        pPlayer.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 100, 0, false, true));
+        pPlayer.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 1, false, true));
+        pPlayer.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 60, 0, false, true));
     }
 
     private static void removeCamouflage(Player pPlayer) {
@@ -79,18 +85,18 @@ public class CreeperFruitHandler
     }
 
     private static void powerUser(Player pPlayer) {
-        pPlayer.addEffect(new MobEffectInstance(ModEffects.POWERED.get(), 300, 0, false, false));
+        pPlayer.addEffect(new MobEffectInstance(ModEffects.POWER.get(), 100, 0, false, false));
     }
 
     private static boolean isPoweredUser(Player pPlayer) {
-        return pPlayer.hasEffect(ModEffects.POWERED.get());
+        return pPlayer.hasEffect(ModEffects.POWER.get());
     }
 
     private static float calculateExplosionPower(Player pPlayer) {
         if (isPoweredUser(pPlayer)) {
-            return 4;
+            return 1.5F;
         }
-        else return 2;
+        else return 1F;
     }
 
 }

@@ -2,6 +2,9 @@ package ttv.migami.mdf.entity.fruit.skeleton;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -13,6 +16,15 @@ import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.Animation;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import ttv.migami.mdf.init.ModEntities;
 import ttv.migami.mdf.init.ModSounds;
 
@@ -21,15 +33,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class BoneZone extends Entity implements TraceableEntity {
+public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
+    private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private int warmupDelayTicks;
-    private int lifeTicks = 300;
+    private int lifeTicks = 200;
     @Nullable
     private LivingEntity owner;
     @Nullable
     private UUID ownerUUID;
     private float damage = 3.0F;
     private Set<Entity> damagedEntities = new HashSet<>();
+
+    private static final EntityDataAccessor<Boolean> JUST_SPAWNED =
+            SynchedEntityData.defineId(BoneZone.class, EntityDataSerializers.BOOLEAN);
+
+    private static final EntityDataAccessor<Boolean> DESPAWNING =
+            SynchedEntityData.defineId(BoneZone.class, EntityDataSerializers.BOOLEAN);
 
     public BoneZone(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -64,7 +83,8 @@ public class BoneZone extends Entity implements TraceableEntity {
 
     @Override
     protected void defineSynchedData() {
-
+        this.entityData.define(JUST_SPAWNED, true);
+        this.entityData.define(DESPAWNING, false);
     }
 
     @Override
@@ -101,10 +121,14 @@ public class BoneZone extends Entity implements TraceableEntity {
             if (--this.warmupDelayTicks < 0) {
                 --this.lifeTicks;
                 if (this.warmupDelayTicks == -1) {
-                    level.playSound(this, this.blockPosition(), ModSounds.BONE_ZONE.get(), SoundSource.PLAYERS, 3F, 1F);
+                    this.setJustSpawned(true);
+                    level.playSound(this, this.blockPosition(), ModSounds.BONE_ZONE.get(), SoundSource.PLAYERS, 2F, 1F);
                 }
-
-                if (--this.lifeTicks < 0) {
+                if (this.lifeTicks < 5) {
+                    this.setJustSpawned(false);
+                    this.setDespawning(true);
+                }
+                if (this.lifeTicks < 0) {
                     this.discard();
                 }
             }
@@ -117,6 +141,44 @@ public class BoneZone extends Entity implements TraceableEntity {
 
     private void markAsDamaged(Entity entity) {
         damagedEntities.add(entity);
+    }
+
+    public void setJustSpawned(boolean justSpawned) {
+        this.entityData.set(JUST_SPAWNED, justSpawned);
+    }
+
+    public boolean justSpawned() {
+        return this.entityData.get(JUST_SPAWNED);
+    }
+
+    public void setDespawning(boolean despawning) {
+        this.entityData.set(DESPAWNING, despawning);
+    }
+
+    public boolean despawning() {
+        return this.entityData.get(DESPAWNING);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+        controllerRegistrar.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(software.bernie.geckolib.core.animation.AnimationState<GeoAnimatable> geoAnimatableAnimationState) {
+        if (this.justSpawned())
+        {
+            geoAnimatableAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.bone_zone.spawn", Animation.LoopType.PLAY_ONCE));
+        }
+        else if (this.despawning())
+        {
+            geoAnimatableAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.bone_zone.despawn", Animation.LoopType.HOLD_ON_LAST_FRAME));
+        }
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
 }

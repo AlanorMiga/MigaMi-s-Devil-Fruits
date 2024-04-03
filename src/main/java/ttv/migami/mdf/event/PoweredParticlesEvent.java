@@ -22,7 +22,7 @@ public class PoweredParticlesEvent {
 
         if (level instanceof ServerLevel serverLevel)
         {
-            if(player.hasEffect(ModEffects.POWERED.get()) && !player.hasEffect(MobEffects.INVISIBILITY)) {
+            if(player.hasEffect(ModEffects.POWER.get()) && !player.hasEffect(MobEffects.INVISIBILITY)) {
                 serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                         player.getX(), player.getY() + 1, player.getZ(), 2, 0.3, 0.4, 0.3, 0);
             }

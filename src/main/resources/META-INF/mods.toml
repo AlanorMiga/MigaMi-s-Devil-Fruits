@@ -28,3 +28,9 @@ description="Devil Fruits have arrived!"
     versionRange="[0.6.16,)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.mdf]]
+    modId="geckolib"
+    mandatory=true
+    versionRange="[4.4.4,)"
+    ordering="NONE"
+    side="BOTH"

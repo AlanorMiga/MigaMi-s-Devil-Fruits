@@ -9,6 +9,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
 import ttv.migami.mdf.init.ModEntities;
 import ttv.migami.mdf.init.ModSounds;
 
@@ -16,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SmallBone extends Entity implements TraceableEntity {
+public class Bone extends Entity implements TraceableEntity, GeoEntity {
+    private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private int warmupDelayTicks;
     private int lifeTicks = 100;
     @Nullable
@@ -28,11 +36,11 @@ public class SmallBone extends Entity implements TraceableEntity {
     private float damage = 3;
     private List<Entity> hurtEntities = new ArrayList<>();
 
-    public SmallBone(EntityType<?> pEntityType, Level pLevel) {
+    public Bone(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
-    public SmallBone(Level pLevel, Player pPlayer, Vec3 pPos) {
+    public Bone(Level pLevel, Player pPlayer, Vec3 pPos) {
         super(ModEntities.SMALL_BONE.get(), pLevel);
         this.setPos(pPos.add(0, 1, 0));
         this.setOwner(pPlayer);
@@ -107,7 +115,7 @@ public class SmallBone extends Entity implements TraceableEntity {
             if (--this.warmupDelayTicks < 0) {
                 --this.lifeTicks;
                 if (this.warmupDelayTicks == -1) {
-                    level.playSound(this, this.blockPosition(), ModSounds.BONE_THROW.get(), SoundSource.PLAYERS, 3F, 1F);
+                    level.playSound(this, this.blockPosition(), ModSounds.BONE_THROW.get(), SoundSource.PLAYERS, 1F, 1F);
                 }
 
                 if (--this.lifeTicks < 0) {
@@ -149,5 +157,19 @@ public class SmallBone extends Entity implements TraceableEntity {
         float f2 = -Mth.cos(-pitch * 0.017453292F);
         float f3 = Mth.sin(-pitch * 0.017453292F);
         return new Vec3(f1 * f2, f3, f * f2);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+        controllerRegistrar.add(new AnimationController<GeoAnimatable>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(software.bernie.geckolib.core.animation.AnimationState<GeoAnimatable> geoAnimatableAnimationState) {
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

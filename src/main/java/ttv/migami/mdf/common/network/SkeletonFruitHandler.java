@@ -14,7 +14,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import ttv.migami.mdf.entity.fruit.skeleton.BoneZone;
 import ttv.migami.mdf.entity.fruit.skeleton.GasterBlaster;
-import ttv.migami.mdf.entity.fruit.skeleton.SmallBone;
+import ttv.migami.mdf.entity.fruit.skeleton.Bone;
 import ttv.migami.mdf.init.ModSounds;
 
 import static ttv.migami.mdf.common.network.ServerPlayHandler.actionSlowdown;
@@ -48,7 +48,7 @@ public class SkeletonFruitHandler
                     playerPos = pPlayer.getPosition(1F);
 
                     actionSlowdown(pPlayer);
-                    SmallBone bone = new SmallBone(pLevel, pPlayer, playerPos);
+                    Bone bone = new Bone(pLevel, pPlayer, playerPos);
                     pLevel.addFreshEntity(bone);
                     break;
                 case 2:
@@ -60,25 +60,25 @@ public class SkeletonFruitHandler
                     Vec3 rightVec = new Vec3(-lookVec.z, 0, lookVec.x).normalize();
                     Vec3 forwardVec = new Vec3(lookVec.x, 0, lookVec.z).normalize();
 
-                    double sideOffset = 1.5;
+                    double sideOffset = 2.5;
                     double randomChance = Math.random();
 
                     if (randomChance < 0.5) {
                         sideOffset *= -1;
                     }
 
-                    double offsetX = rightVec.x * sideOffset + forwardVec.x * 0.5; //Move the blaster 2.5 blocks to the side and 0.5 blocks forward
+                    double offsetX = rightVec.x * sideOffset + forwardVec.x * 2; //Move the blaster 2.5 blocks to the side and 2 blocks forward
                     double offsetY = pPlayer.getEyeHeight() + 0.4; //Move the blaster slightly above the player's head
-                    double offsetZ = rightVec.z * sideOffset + forwardVec.z * 0.5; //Move the blaster 2.5 blocks to the side and 0.5 blocks forward
+                    double offsetZ = rightVec.z * sideOffset + forwardVec.z * 2; //Move the blaster 2.5 blocks to the side and 2 blocks forward
 
                     playerPos = pPlayer.getPosition(1F).add(offsetX, offsetY, offsetZ);
 
                     actionSlowdown(pPlayer);
                     if (entityHitResult != null && !pPlayer.isCrouching()) {
-                        gasterBlaster = new GasterBlaster(pLevel, pPlayer, playerPos, entityHitResult.getEntity(), (float) look.x, (float) look.y);
+                        gasterBlaster = new GasterBlaster(pLevel, pPlayer, playerPos, entityHitResult.getEntity());
                     }
                     else {
-                        gasterBlaster = new GasterBlaster(pLevel, pPlayer, playerPos, blockPos.getCenter(), (float) look.x, (float) look.y);
+                        gasterBlaster = new GasterBlaster(pLevel, pPlayer, playerPos, blockPos.getCenter());
                     }
                     pLevel.addFreshEntity(gasterBlaster);
                     break;
@@ -93,14 +93,14 @@ public class SkeletonFruitHandler
                     pTarget = (LivingEntity) entityHitResult.getEntity();
 
                     pLevel.playSound(pTarget, pTarget.blockPosition(), ModSounds.GASTER_BLASTER_PRIME.get(), SoundSource.PLAYERS, 3F, 1F);
-                    if (pTarget instanceof Player)
-                    {
-                        pTarget.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 10, 32, false, false));
-                    }
+                    //if (pTarget instanceof Player)
+                    //{
+                        pTarget.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 10, 24, false, false));
+                    /*}
                     else
                     {
                         pTarget.push(normal.x() * 2, normal.y() * -2, normal.z() * 2);
-                    }
+                    }*/
                     pTarget.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false));
                     pTarget.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 6, false, false));
                     pTarget.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 60, 6, false, false));
@@ -112,15 +112,30 @@ public class SkeletonFruitHandler
 
                     if (entityHitResult != null) {
                         pTarget = (LivingEntity) entityHitResult.getEntity();
+                        Vec3 pGasterPos = pTarget.getPosition(1F);
                         if (pTarget.fallDistance == 0) {
                             pLevel.addFreshEntity(new BoneZone(pLevel, pPlayer, BlockPos.containing(entityHitResult.getLocation()), (float) look.x));
                         }
+                        else {
+                            // Spawn Gaster Blasters in a triangle formation
+                            double angleIncrement = Math.PI * 2 / 3;
+                            double radius = 4.0;
+                            for (int i = 0; i < 3; i++) {
+                                double angle = angleIncrement * i;
+                                offsetX = Math.cos(angle) * radius;
+                                offsetZ = Math.sin(angle) * radius;
+                                Vec3 blasterPos = pGasterPos.add(offsetX, 3, offsetZ);
 
-                        pLevel.playSound(pTarget, pTarget.blockPosition(), ModSounds.GASTER_BLASTER_PRIME.get(), SoundSource.PLAYERS, 3F, 1F);
-                        entityHitResult.getEntity().push(0, -5, 0);
-                        pTarget.removeEffect(MobEffects.LEVITATION);
-                        pTarget.removeEffect(MobEffects.SLOW_FALLING);
-                        pTarget.fallDistance = 4;
+                                gasterBlaster = new GasterBlaster(pLevel, pPlayer, blasterPos, entityHitResult.getEntity());
+                                pLevel.addFreshEntity(gasterBlaster);
+                            }
+                        }
+
+                        //pLevel.playSound(pTarget, pTarget.blockPosition(), ModSounds.GASTER_BLASTER_PRIME.get(), SoundSource.PLAYERS, 3F, 1F);
+                        //entityHitResult.getEntity().push(0, -5, 0);
+                        //pTarget.removeEffect(MobEffects.LEVITATION);
+                        //pTarget.removeEffect(MobEffects.SLOW_FALLING);
+                        //pTarget.fallDistance = 4;
                     }
                     else {
                         pLevel.addFreshEntity(new BoneZone(pLevel, pPlayer, blockPos, (float) look.x));
@@ -128,7 +143,7 @@ public class SkeletonFruitHandler
                     break;
                 case 5:
                     blockPos = rayTrace(pPlayer, 14.0D);
-                    pLevel.playSound(pPlayer, blockPos, ModSounds.BLINK.get(), SoundSource.PLAYERS, 3F, 1F);
+                    pLevel.playSound(pPlayer, blockPos, ModSounds.BLINK.get(), SoundSource.PLAYERS, 2F, 1F);
                     pPlayer.teleportTo(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                     pPlayer.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false));
                     break;
