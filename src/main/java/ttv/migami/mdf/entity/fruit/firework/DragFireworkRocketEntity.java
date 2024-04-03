@@ -39,7 +39,7 @@ public class DragFireworkRocketEntity extends CustomFireworkRocketEntity {
         super.tick();
 
         if (!this.isRemoved()) {
-            List<Entity> nearbyEntities = this.level().getEntities(this, new AABB(
+            List<Entity> nearbyEntities = this.level.getEntities(this, new AABB(
                     this.getX() - 2, this.getY() - 2, this.getZ() - 2,
                     this.getX() + 2, this.getY() + 2, this.getZ() + 2),
                     EntitySelector.NO_SPECTATORS);

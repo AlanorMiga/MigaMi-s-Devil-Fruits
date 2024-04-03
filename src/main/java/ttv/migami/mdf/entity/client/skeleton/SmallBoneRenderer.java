@@ -10,11 +10,11 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import ttv.migami.mdf.Reference;
 import ttv.migami.mdf.entity.client.ModModelLayers;
-import ttv.migami.mdf.entity.fruit.skeleton.SmallBone;
+import ttv.migami.mdf.entity.fruit.skeleton.Bone;
 
-public class SmallBoneRenderer extends EntityRenderer<SmallBone> {
+public class SmallBoneRenderer extends EntityRenderer<Bone> {
     private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation(Reference.MOD_ID, "textures/fruit/skeleton/bone.png");
-    private final SmallBoneModel<SmallBone> model;
+    private final SmallBoneModel<Bone> model;
 
     public SmallBoneRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
@@ -22,12 +22,12 @@ public class SmallBoneRenderer extends EntityRenderer<SmallBone> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(SmallBone pEntity) {
+    public ResourceLocation getTextureLocation(Bone pEntity) {
         return TEXTURE_LOCATION;
     }
 
     @Override
-    public void render(SmallBone pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack,
+    public void render(Bone pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack,
                        MultiBufferSource pBuffer, int pPackedLight) {
 
         pPoseStack.pushPose();

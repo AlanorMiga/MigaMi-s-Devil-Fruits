@@ -1,12 +1,18 @@
+buildscript {
+    repositories {
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+}
+
 plugins {
     id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '6.0.+'
     id 'org.spongepowered.mixin' version '0.7.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    //id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-version = "0.0.1-1.20.1"
+version = "0.0.1-1.19.4"
 group = "ttv.migami"
 archivesBaseName = "MigaMi'sDevilFruits"
 
@@ -20,8 +26,8 @@ mixin {
 }
 
 minecraft {
-    // mappings channel: 'official', version: '1.20.1'
-    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
+    mappings channel: 'official', version: '1.19.4'
+    //mappings channel: 'parchment', version: '2023.09.03-1.20.1'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -78,11 +84,20 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.dev"
     }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
+    }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
-    implementation fg.deobf('curse.maven:framework-549225:4718251')
+    minecraft 'net.minecraftforge:forge:1.19.4-45.1.0'
+    implementation fg.deobf('curse.maven:framework-549225:4718249')
+    implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.19.4:4.2')
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 

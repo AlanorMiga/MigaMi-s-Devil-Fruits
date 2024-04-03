@@ -13,18 +13,24 @@ description="Devil Fruits have arrived!"
 [[dependencies.mdf]]
     modId="forge"
     mandatory=true
-    versionRange="[46, 48)"
+    versionRange="[44.1.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.mdf]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.20, 1.20.2)"
+    versionRange="[1.19.4,1.20)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.mdf]]
     modId="framework"
     mandatory=true
     versionRange="[0.6.16,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.mdf]]
+    modId="geckolib"
+    mandatory=true
+    versionRange="[4.2,)"
     ordering="NONE"
     side="BOTH"

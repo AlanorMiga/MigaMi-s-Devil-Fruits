@@ -24,7 +24,7 @@ public class FireworkFruitHandler
 {
 
     public static void moveHandler(Player pShooter, int move) {
-        Level pLevel = pShooter.level();
+        Level pLevel = pShooter.level;
 
         if (!pLevel.isClientSide()) {
 

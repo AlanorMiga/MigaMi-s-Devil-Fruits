@@ -20,7 +20,7 @@ public class ServerPlayHandler
 
     // Placeholder for action!
     public static void shootSnowball(ServerPlayer pShooter) {
-        Level pLevel = pShooter.level();
+        Level pLevel = pShooter.level;
 
         if (!pLevel.isClientSide()) {
             Snowball snowball = new Snowball(pLevel, pShooter);

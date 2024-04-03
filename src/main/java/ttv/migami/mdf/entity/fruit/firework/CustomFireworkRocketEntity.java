@@ -62,7 +62,7 @@ public class CustomFireworkRocketEntity extends FireworkRocketEntity {
 
     @Override
     public void explode() {
-        this.level().broadcastEntityEvent(this, (byte)17);
+        this.level.broadcastEntityEvent(this, (byte)17);
         this.gameEvent(GameEvent.EXPLODE, this.getOwner());
         this.dealExplosionDamageToOthers(this.damage);
         this.discard();
@@ -84,7 +84,7 @@ public class CustomFireworkRocketEntity extends FireworkRocketEntity {
 
 
             Vec3 vec3 = this.position();
-            Iterator var8 = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0)).iterator();
+            Iterator var8 = this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(5.0)).iterator();
 
             while(true) {
                 LivingEntity livingentity;
@@ -102,7 +102,7 @@ public class CustomFireworkRocketEntity extends FireworkRocketEntity {
 
                 for(int i = 0; i < 2; ++i) {
                     Vec3 vec31 = new Vec3(livingentity.getX(), livingentity.getY(0.5 * (double)i), livingentity.getZ());
-                    HitResult hitresult = this.level().clip(new ClipContext(vec3, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+                    HitResult hitresult = this.level.clip(new ClipContext(vec3, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
                     if (hitresult.getType() == HitResult.Type.MISS) {
                         flag = true;
                         break;

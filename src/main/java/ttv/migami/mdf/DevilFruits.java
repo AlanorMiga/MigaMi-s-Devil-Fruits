@@ -16,14 +16,15 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import software.bernie.geckolib.GeckoLib;
 import ttv.migami.mdf.client.ClientHandler;
 import ttv.migami.mdf.client.KeyBinds;
 import ttv.migami.mdf.client.MetaLoader;
 import ttv.migami.mdf.datagen.FruitGen;
 import ttv.migami.mdf.datagen.WorldGen;
-import ttv.migami.mdf.entity.client.skeleton.BoneZoneRenderer;
-import ttv.migami.mdf.entity.client.skeleton.GasterBlasterRenderer;
-import ttv.migami.mdf.entity.client.skeleton.SmallBoneRenderer;
+import ttv.migami.mdf.entity.client.skeleton.BoneGeoRenderer;
+import ttv.migami.mdf.entity.client.skeleton.BoneZoneGeoRenderer;
+import ttv.migami.mdf.entity.client.skeleton.GasterBlasterGeoRenderer;
 import ttv.migami.mdf.init.*;
 import ttv.migami.mdf.network.PacketHandler;
 import ttv.migami.mdf.world.loot.ModLootModifiers;
@@ -52,9 +53,13 @@ public class DevilFruits {
         bus.addListener(this::onCommonSetup);
         bus.addListener(this::onClientSetup);
         bus.addListener(this::onGatherData);
+
+        // OooOoOh spooky!
+        GeckoLib.initialize();
+
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FrameworkClientAPI.registerDataLoader(MetaLoader.getInstance());
-            ClientHandler.onRegisterCreativeTab(bus);
+            bus.addListener(ClientHandler::onRegisterCreativeTab);
             bus.addListener(KeyBinds::registerKeyMappings);
         });
 
@@ -62,9 +67,9 @@ public class DevilFruits {
 
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(ClientHandler::setup);
-        EntityRenderers.register(ModEntities.GASTER_BLASTER.get(), GasterBlasterRenderer::new);
-        EntityRenderers.register(ModEntities.SMALL_BONE.get(), SmallBoneRenderer::new);
-        EntityRenderers.register(ModEntities.BONE_ZONE.get(), BoneZoneRenderer::new);
+        EntityRenderers.register(ModEntities.GASTER_BLASTER.get(), GasterBlasterGeoRenderer::new);
+        EntityRenderers.register(ModEntities.SMALL_BONE.get(), BoneGeoRenderer::new);
+        EntityRenderers.register(ModEntities.BONE_ZONE.get(), BoneZoneGeoRenderer::new);
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event) {

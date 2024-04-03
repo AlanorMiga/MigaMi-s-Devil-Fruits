@@ -1,4 +1,4 @@
-package ttv.migami.mdf.entity.fruit.skeleton;// Save this class in your mod and generate all required imports
+package ttv.migami.mdf.entity.fruit.skeleton;
 
 import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;

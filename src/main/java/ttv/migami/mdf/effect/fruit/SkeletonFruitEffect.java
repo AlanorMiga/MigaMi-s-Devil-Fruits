@@ -26,7 +26,7 @@ public class SkeletonFruitEffect extends FruitEffect
 
     public float c_damage = 5.0F;
     public boolean c_canBeHeld = false;
-    public int c_cooldown = 100;
+    public int c_cooldown = 200;
     public int c_attackInterval = 0;
     public int c_attackAmount = 1;
 

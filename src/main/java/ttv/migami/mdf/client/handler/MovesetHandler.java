@@ -1,6 +1,8 @@
 package ttv.migami.mdf.client.handler;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,6 +17,8 @@ import ttv.migami.mdf.effect.FruitEffect;
 import ttv.migami.mdf.init.ModEffects;
 import ttv.migami.mdf.network.PacketHandler;
 import ttv.migami.mdf.network.message.C2SFruitMessage;
+
+import java.util.Locale;
 
 @Mod.EventBusSubscriber(modid = Reference.MOD_ID, value = Dist.CLIENT)
 public class MovesetHandler {
@@ -86,6 +90,7 @@ public class MovesetHandler {
             }
             if (z_cooldown == 0 && z_amount == 0) {
                 z_amount = effect.getZAttackAmount();
+                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.z_ready", KeyBinds.KEY_Z_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
             }
             if (x_cooldown > 0) {
                 x_cooldown--;
@@ -95,6 +100,7 @@ public class MovesetHandler {
             }
             if (x_cooldown == 0 && x_amount == 0) {
                 x_amount = effect.getXAttackAmount();
+                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.x_ready", KeyBinds.KEY_X_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
             }
             if (c_cooldown > 0) {
                 c_cooldown--;
@@ -104,6 +110,7 @@ public class MovesetHandler {
             }
             if (c_cooldown == 0 && c_amount == 0) {
                 c_amount = effect.getCAttackAmount();
+                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.c_ready", KeyBinds.KEY_C_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
             }
             if (v_cooldown > 0) {
                 v_cooldown--;
@@ -113,6 +120,7 @@ public class MovesetHandler {
             }
             if (v_cooldown == 0 && v_amount == 0) {
                 v_amount = effect.getVAttackAmount();
+                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.v_ready", KeyBinds.KEY_V_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
             }
             if (f_cooldown > 0) {
                 f_cooldown--;
@@ -122,6 +130,7 @@ public class MovesetHandler {
             }
             if (f_cooldown == 0 && f_amount == 0) {
                 f_amount = effect.getFAttackAmount();
+                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.f_ready", KeyBinds.KEY_F_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
             }
         }
     }
