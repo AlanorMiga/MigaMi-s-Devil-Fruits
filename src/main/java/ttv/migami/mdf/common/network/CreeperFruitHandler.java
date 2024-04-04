@@ -94,9 +94,9 @@ public class CreeperFruitHandler
 
     private static float calculateExplosionPower(Player pPlayer) {
         if (isPoweredUser(pPlayer)) {
-            return 1.5F;
+            return 2F;
         }
-        else return 1F;
+        else return 1.5F;
     }
 
 }
