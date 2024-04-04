@@ -14,5 +14,6 @@ public class ModParticleTypes {
     public static final DeferredRegister<ParticleType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Reference.MOD_ID);
 
     public static final RegistryObject<SimpleParticleType> GASTER_BLASTER_BEAM = REGISTER.register("gaster_blaster_beam", () -> new SimpleParticleType(true));
+    public static final RegistryObject<SimpleParticleType> SKELETON_CONTROL_PARTICLE = REGISTER.register("skeleton_control", () -> new SimpleParticleType(true));
 
 }

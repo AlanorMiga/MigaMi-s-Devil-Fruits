@@ -1,6 +1,7 @@
 package ttv.migami.mdf.common.network;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,9 +13,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import ttv.migami.mdf.entity.fruit.skeleton.Bone;
 import ttv.migami.mdf.entity.fruit.skeleton.BoneZone;
 import ttv.migami.mdf.entity.fruit.skeleton.GasterBlaster;
-import ttv.migami.mdf.entity.fruit.skeleton.Bone;
+import ttv.migami.mdf.init.ModParticleTypes;
 import ttv.migami.mdf.init.ModSounds;
 
 import static ttv.migami.mdf.common.network.ServerPlayHandler.actionSlowdown;
@@ -92,6 +94,7 @@ public class SkeletonFruitHandler
 
                     pTarget = (LivingEntity) entityHitResult.getEntity();
 
+                    ((ServerLevel) pLevel).sendParticles(ModParticleTypes.SKELETON_CONTROL_PARTICLE.get(), pTarget.getX(), pTarget.getY(), pTarget.getZ(), 32, 1, 0.4, 1, 1);
                     pLevel.playSound(pTarget, pTarget.blockPosition(), ModSounds.GASTER_BLASTER_PRIME.get(), SoundSource.PLAYERS, 3F, 1F);
                     //if (pTarget instanceof Player)
                     //{
@@ -143,8 +146,10 @@ public class SkeletonFruitHandler
                     break;
                 case 5:
                     blockPos = rayTrace(pPlayer, 14.0D);
-                    pLevel.playSound(pPlayer, blockPos, ModSounds.BLINK.get(), SoundSource.PLAYERS, 2F, 1F);
+                    ((ServerLevel) pLevel).sendParticles(ModParticleTypes.SKELETON_CONTROL_PARTICLE.get(), pPlayer.getX(), pPlayer.getY() + 0.5, pPlayer.getZ(), 32, 0.3, 0.4, 0.3, 1);
+                    pLevel.playSound(null, blockPos, ModSounds.BLINK.get(), SoundSource.PLAYERS, 2F, 1F);
                     pPlayer.teleportTo(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+                    ((ServerLevel) pLevel).sendParticles(ModParticleTypes.SKELETON_CONTROL_PARTICLE.get(), pPlayer.getX(), pPlayer.getY() + 0.5, pPlayer.getZ(), 32, 0.3, 0.4, 0.3, 1);
                     pPlayer.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false));
                     break;
             }

@@ -8,10 +8,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.TraceableEntity;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -36,7 +34,7 @@ import ttv.migami.mdf.init.ModSounds;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity {
+public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private int warmupDelayTicks;
     private boolean shot = false;
@@ -83,7 +81,7 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
     }
 
     @Nullable
-    public Vec3 getTarget() {
+    public Vec3 getTargetPos() {
         if (this.target != null) {
             return target;
         }
@@ -114,6 +112,7 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
 
     @Override
     protected void defineSynchedData() {
+        super.defineSynchedData();
         this.entityData.define(ATTACKING, false);
         this.entityData.define(JUST_SPAWNED, true);
         this.entityData.define(DESPAWNING, false);
@@ -124,12 +123,12 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compoundTag) {
+    public void readAdditionalSaveData(CompoundTag compoundTag) {
 
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {
+    public void addAdditionalSaveData(CompoundTag compoundTag) {
 
     }
 
@@ -141,6 +140,7 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
 
         if (!level.isClientSide)
         {
+            this.setNoAi(true);
             if (!this.shot)
             {
                 if (this.targetEntity != null) {
@@ -150,6 +150,7 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
                     this.lookAt(EntityAnchorArgument.Anchor.EYES, this.target);
                 }
             }
+
             if (--this.warmupDelayTicks < 0) {
                 --this.lifeTicks;
                 if (this.warmupDelayTicks == -1) {
@@ -184,7 +185,7 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
         Vec3 eyePos = this.getEyePosition().add(0, -0.75, 0);
         Vec3 targetPos = result.getLocation();
         if (this.target != null) {
-            targetPos = this.getTarget();
+            targetPos = this.getTargetPos();
         }
         Vec3 distanceTo = targetPos.subtract(eyePos);
         Vec3 normal = distanceTo.normalize();
@@ -201,7 +202,9 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
 
         EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(level, this, eyePos, targetPos, new AABB(eyePos, targetPos), this::canDamage);
 
-        if(entityHitResult != null && entityHitResult.getEntity() instanceof LivingEntity entity && entity != owner) {
+        if(entityHitResult != null &&
+                entityHitResult.getEntity() instanceof LivingEntity entity &&
+                entity != owner && !(entity instanceof GasterBlaster)) {
 
             entity.hurt(this.damageSources().sonicBoom(this), this.damage);
             double d1 = 0.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
@@ -241,6 +244,14 @@ public class GasterBlaster extends Entity implements TraceableEntity, GeoEntity 
 
         return entity instanceof LivingEntity;
 
+    }
+
+    public static AttributeSupplier.Builder createAttributes()
+    {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 6.0D)
+                .add(Attributes.ATTACK_DAMAGE, 4.0D)
+                .add(Attributes.ARMOR, 4.0D);
     }
 
     @Override

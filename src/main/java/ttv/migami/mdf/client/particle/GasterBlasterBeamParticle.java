@@ -1,4 +1,4 @@
-package ttv.migami.mdf.particles;
+package ttv.migami.mdf.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.HugeExplosionParticle;
