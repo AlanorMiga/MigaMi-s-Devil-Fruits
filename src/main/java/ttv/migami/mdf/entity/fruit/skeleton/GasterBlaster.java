@@ -204,9 +204,11 @@ public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
 
         if(entityHitResult != null &&
                 entityHitResult.getEntity() instanceof LivingEntity entity &&
-                entity != owner && !(entity instanceof GasterBlaster)) {
+                owner != null &&
+                entity != owner &&
+                !(entity instanceof GasterBlaster)) {
 
-            entity.hurt(this.damageSources().sonicBoom(this), this.damage);
+            entity.hurt(owner.damageSources().sonicBoom(owner), this.damage);
             double d1 = 0.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             double d0 = 2.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             entity.push(normal.x() * d0, normal.y() * d1, normal.z() * d0);

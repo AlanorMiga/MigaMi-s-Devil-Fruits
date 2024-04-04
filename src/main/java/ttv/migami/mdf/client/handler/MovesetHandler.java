@@ -155,6 +155,7 @@ public class MovesetHandler {
                             PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(fruit, 1));
                             z_interval = effect.getZAttackInterval();
                             z_amount--;
+                            //player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20, 0, false, false));
                         }
                     }
                     if (z_amount == 0) {
