@@ -16,7 +16,7 @@ public class FireworkFruitItem extends FruitItem {
                         .alwaysEat()
                         .effect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0), 1.0F)
                         .effect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 0), 1.0F)
-                        .effect(new MobEffectInstance(ModEffects.FIREWORK_FRUIT.get(), 360000, 0, false, false), 1.0F)
+                        .effect(new MobEffectInstance(ModEffects.FIREWORK_FRUIT.get(), -1, 0, false, false), 1.0F)
                         .build()
         ));
     }

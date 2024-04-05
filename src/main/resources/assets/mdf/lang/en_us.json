@@ -23,6 +23,7 @@
   "info.mdf.c_ready": "%s move is ready!",
   "info.mdf.v_ready": "%s move is ready!",
   "info.mdf.f_ready": "%s move is ready!",
+  "info.jeg.ability_help": "Keybindings are in Settings!",
   "itemGroup.mdf": "MigaMi's Devil Fruits",
   "key.categories.mdf": "MigaMi's Devil Fruits",
   "key.mdf.z_action": "Z-Action",
