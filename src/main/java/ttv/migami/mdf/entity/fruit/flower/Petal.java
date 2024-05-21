@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static ttv.migami.mdf.common.network.ServerPlayHandler.calculateCustomDamage;
+
 public class Petal extends Entity {
     private int warmupDelayTicks;
     public int life = 100;
@@ -25,7 +27,7 @@ public class Petal extends Entity {
     private LivingEntity owner;
     @Nullable
     private UUID ownerUUID;
-    public float damage = 2.0F;
+    public float damage = 5.0F;
     public float customDamage = damage;
 
     public Petal(EntityType<?> pEntityType, Level pLevel) {
@@ -96,7 +98,7 @@ public class Petal extends Entity {
         this.customDamage = this.damage;
         if (this.getOwner() instanceof Player) {
             Player owner = (Player) this.getOwner();
-            this.customDamage = ServerPlayHandler.calculateCustomDamage(owner, this.damage);
+            this.customDamage = ServerPlayHandler.calculateCustomDamage(owner, calculateCustomDamage(owner, 2F));
         }
         return this.customDamage;
     }

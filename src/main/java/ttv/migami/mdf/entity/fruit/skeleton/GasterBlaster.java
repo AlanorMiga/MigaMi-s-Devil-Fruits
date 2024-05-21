@@ -239,7 +239,7 @@ public class GasterBlaster extends SummonEntity implements TraceableEntity, GeoE
 
         if (this.targetEntity != null) {
             LivingEntity livingTargetEntity;
-            this.targetEntity.hurt(owner.damageSources().sonicBoom(owner), this.customDamage);
+            this.targetEntity.hurt(owner.damageSources().playerAttack((Player) owner), this.customDamage);
             if (this.targetEntity instanceof LivingEntity) {
                 livingTargetEntity = (LivingEntity) this.targetEntity;
                 double d1 = 0.5D * (1.0D - livingTargetEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
@@ -252,7 +252,7 @@ public class GasterBlaster extends SummonEntity implements TraceableEntity, GeoE
                 entityHitResult.getEntity() instanceof LivingEntity entity &&
                 owner != null && entity != owner && !(entity instanceof GasterBlaster)) {
 
-            entity.hurt(owner.damageSources().sonicBoom(owner), this.customDamage);
+            entity.hurt(owner.damageSources().playerAttack((Player) owner), this.customDamage);
             double d1 = 0.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             double d0 = 2.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             entity.push(normal.x() * d0, normal.y() * d1, normal.z() * d0);

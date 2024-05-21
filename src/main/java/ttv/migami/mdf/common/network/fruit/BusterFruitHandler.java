@@ -44,7 +44,7 @@ public class BusterFruitHandler
                     actionSlowdown(pPlayer);
                     if (entityHitResult != null) {
                         Entity target = entityHitResult.getEntity();
-                        target.hurt(pPlayer.damageSources().mobProjectile(target, pPlayer), 1.5F);
+                        target.hurt(pPlayer.damageSources().mobProjectile(target, pPlayer), calculateCustomDamage(pPlayer, 1.5F));
                         if (!pPlayer.level().isClientSide) {
                             ((ServerLevel) pPlayer.level()).sendParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getY(), target.getZ(), 2, 0.3, target.getBbHeight(), 0.3, 0.2);
                         }

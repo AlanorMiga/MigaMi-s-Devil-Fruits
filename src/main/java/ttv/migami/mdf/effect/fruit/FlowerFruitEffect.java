@@ -25,7 +25,7 @@ public class FlowerFruitEffect extends FruitEffect {
         actions.put(ActionType.Z, new Action(5.0F, false, 100, 20, 2, Component.translatable("info.mdf.flower.z_action"), false, false, 0.0F));
         actions.put(ActionType.X, new Action(5.0F, false, 500, 0, 1, Component.translatable("info.mdf.flower.x_action"), false, false, 3.0F));
         actions.put(ActionType.C, new Action(5.0F, true, 600, 20, 3, Component.translatable("info.mdf.flower.c_action"), false, false, 0.0F));
-        actions.put(ActionType.V, new Action(5.0F, true, 800, 5, 64, Component.translatable("info.mdf.flower.v_action"), false, false, 0.0F));
+        actions.put(ActionType.V, new Action(5.0F, true, 800, 3, 82, Component.translatable("info.mdf.flower.v_action"), false, false, 0.0F));
         actions.put(ActionType.F, new Action(5.0F, false, 800, 0, 1, Component.translatable("info.mdf.flower.f_action"), true, false, 0.0F));
     }
 

@@ -35,6 +35,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
+import static ttv.migami.mdf.common.network.ServerPlayHandler.calculateCustomDamage;
+
 public class FlowerSpear extends SummonEntity implements GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public int life = 14;
@@ -115,7 +117,7 @@ public class FlowerSpear extends SummonEntity implements GeoEntity {
                         ((ServerLevel) level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, entity.getX(), entity.getY(), entity.getZ(), 4, 0.3, entity.getBbHeight(), 0.3, 0.2);
                     }
 
-                    entity.hurt(entity.damageSources().playerAttack((Player) owner), 4);
+                    entity.hurt(entity.damageSources().playerAttack((Player) owner), calculateCustomDamage((Player) owner, 4F));
                     entity.invulnerableTime = 0;
                 }
             }

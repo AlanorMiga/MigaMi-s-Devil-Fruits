@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -21,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static ttv.migami.mdf.common.network.ServerPlayHandler.calculateCustomDamage;
 
 public class Piano extends Entity {
     public int life = 188;
@@ -75,7 +78,7 @@ public class Piano extends Entity {
             List<Entity> entities = this.level().getEntities(this, hitbox);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity && !hasBeenDamaged(entity)) {
-                    entity.hurt(this.damageSources().fallingBlock(entity), customDamage);
+                    entity.hurt(this.damageSources().fallingBlock(entity), calculateCustomDamage((Player) owner, customDamage));
                     this.markAsDamaged(entity);
                 }
             }
@@ -93,7 +96,7 @@ public class Piano extends Entity {
             List<Entity> entities = this.level().getEntities(this, hitbox);
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity && !hasBeenDamaged(entity)) {
-                    entity.hurt(this.damageSources().fallingBlock(entity), customDamage);
+                    entity.hurt(this.damageSources().fallingBlock(entity), calculateCustomDamage((Player) owner, customDamage));
                     this.markAsDamaged(entity);
                 }
             }
