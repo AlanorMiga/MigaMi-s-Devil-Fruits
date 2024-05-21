@@ -38,5 +38,104 @@
         "name": "mdf:fruit/skeleton/bone_zone"
       }
     ]
+  },
+  "fruit.squid.splat": {
+    "subtitle": "subtitle.mdf.fruit.squid.splat",
+    "sounds": [
+      {
+        "name": "mdf:fruit/squid/splat1",
+        "stream": true
+      },
+      {
+        "name": "mdf:fruit/squid/splat2",
+        "stream": true
+      },
+      {
+        "name": "mdf:fruit/squid/splat3",
+        "stream": true
+      }
+    ]
+  },
+  "fruit.squid.explosion": {
+    "subtitle": "subtitle.mdf.fruit.squid.explosion",
+    "sounds": [
+      {
+        "name": "mdf:fruit/squid/explosion"
+      }
+    ]
+  },
+  "fruit.buster.piano": {
+    "subtitle": "subtitle.mdf.fruit.buster.piano",
+    "sounds": [
+      {
+        "name": "mdf:fruit/buster/piano1",
+        "stream": true
+      },
+      {
+        "name": "mdf:fruit/buster/piano2",
+        "stream": true
+      },
+      {
+        "name": "mdf:fruit/buster/piano3",
+        "stream": true
+      }
+    ]
+  },
+  "fruit.buster.fire": {
+    "subtitle": "subtitle.mdf.fruit.buster.fire",
+    "sounds": [
+      {
+        "name": "mdf:fruit/buster/fire"
+      }
+    ]
+  },
+  "fruit.buster.lasso": {
+    "subtitle": "subtitle.mdf.fruit.buster.lasso",
+    "sounds": [
+      {
+        "name": "mdf:fruit/buster/lasso"
+      }
+    ]
+  },
+  "fruit.buster.cactus_grow": {
+    "subtitle": "subtitle.mdf.fruit.buster.cactus_grow",
+    "sounds": [
+      {
+       "name": "mdf:fruit/buster/cactus_grow"
+      }
+    ]
+  },
+  "fruit.flower.whip": {
+    "subtitle": "subtitle.mdf.fruit.flower.whip",
+    "sounds": [
+      {
+        "name": "mdf:fruit/flower/whip"
+      }
+    ]
+  },
+  "fruit.flower.rustle": {
+    "subtitle": "subtitle.mdf.fruit.flower.rustle",
+    "sounds": [
+      {
+        "name": "mdf:fruit/flower/rustle2",
+        "stream": true
+      },
+      {
+        "name": "mdf:fruit/flower/rustle2",
+        "stream": true
+      },
+      {
+        "name": "mdf:fruit/flower/rustle3",
+        "stream": true
+      }
+    ]
+  },
+  "fruit.flower.bite": {
+    "subtitle": "subtitle.mdf.fruit.flower.bite",
+    "sounds": [
+      {
+        "name": "mdf:fruit/flower/bite"
+      }
+    ]
   }
 }

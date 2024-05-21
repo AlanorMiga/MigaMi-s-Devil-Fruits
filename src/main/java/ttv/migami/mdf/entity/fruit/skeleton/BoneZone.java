@@ -1,6 +1,8 @@
 package ttv.migami.mdf.entity.fruit.skeleton;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -15,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -25,6 +28,7 @@ import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
+import ttv.migami.mdf.common.network.ServerPlayHandler;
 import ttv.migami.mdf.init.ModEntities;
 import ttv.migami.mdf.init.ModSounds;
 
@@ -42,6 +46,7 @@ public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
     @Nullable
     private UUID ownerUUID;
     private float damage = 3.0F;
+    private float customDamage = damage;
     private Set<Entity> damagedEntities = new HashSet<>();
 
     private static final EntityDataAccessor<Boolean> JUST_SPAWNED =
@@ -57,11 +62,17 @@ public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
     public BoneZone(Level pLevel, Player pPlayer, BlockPos pPos, float pXRot) {
         super(ModEntities.BONE_ZONE.get(), pLevel);
         this.setPos(pPos.getCenter().add(0, -0.5, 0));
+        this.teleportToGroundOrAir();
         this.setXRot(pXRot);
         this.setOwner(pPlayer);
+
+        if (this.getOwner() instanceof Player) {
+            Player owner = (Player) this.getOwner();
+            this.customDamage = ServerPlayHandler.calculateCustomDamage(owner, this.damage);
+        }
     }
 
-    public void setOwner(@javax.annotation.Nullable LivingEntity pOwner) {
+    public void setOwner(@Nullable LivingEntity pOwner) {
         this.owner = pOwner;
         this.ownerUUID = pOwner == null ? null : pOwner.getUUID();
     }
@@ -69,7 +80,7 @@ public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
     /**
      * Returns null or the entityliving it was ignited by
      */
-    @javax.annotation.Nullable
+    @Nullable
     public LivingEntity getOwner() {
         if (this.owner == null && this.ownerUUID != null && this.level() instanceof ServerLevel) {
             Entity entity = ((ServerLevel)this.level()).getEntity(this.ownerUUID);
@@ -97,6 +108,21 @@ public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
 
     }
 
+    private void teleportToGroundOrAir() {
+        BlockPos currentPos = this.blockPosition();
+        Level level = this.level();
+
+        while (currentPos.getY() > level.getMinBuildHeight() && level.getBlockState(currentPos.below()).isAir()) {
+            currentPos = currentPos.below();
+        }
+
+        while (!level.getBlockState(currentPos).isAir() && currentPos.getY() < level.getMaxBuildHeight()) {
+            currentPos = currentPos.above();
+        }
+
+        this.setPos(currentPos.getX() + 0.5, currentPos.getY(), currentPos.getZ() + 0.5);
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -110,7 +136,7 @@ public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
                 if (entity instanceof LivingEntity && entity != owner) {
                     LivingEntity livingEntity = (LivingEntity) entity;
                     if (!hasBeenDamaged(entity)) {
-                        livingEntity.hurt(this.damageSources().generic(), damage);
+                        livingEntity.hurt(this.damageSources().playerAttack((Player) owner), this.customDamage);
                         livingEntity.invulnerableTime = 0;
                     }
                     livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5, 5, false, false));
@@ -122,7 +148,16 @@ public class BoneZone extends Entity implements TraceableEntity, GeoEntity {
                 --this.lifeTicks;
                 if (this.warmupDelayTicks == -1) {
                     this.setJustSpawned(true);
+
                     level.playSound(this, this.blockPosition(), ModSounds.BONE_ZONE.get(), SoundSource.PLAYERS, 2F, 1F);
+
+                    BlockPos entityPos = this.blockPosition();
+                    BlockPos belowPos = entityPos.below();
+                    BlockState blockStateBelow = level.getBlockState(belowPos);
+
+                    ServerLevel serverLevel = (ServerLevel) this.level();
+                    serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, this.level().getBlockState(belowPos)), belowPos.getX(), belowPos.getY() + 1, belowPos.getZ(), 128, 1.0, 0.0, 1.0, 0.0);
+                    serverLevel.playSound(null, belowPos, blockStateBelow.getSoundType().getBreakSound(), SoundSource.BLOCKS, 3.0F, 1.0F);
                 }
                 if (this.lifeTicks < 5) {
                     this.setJustSpawned(false);

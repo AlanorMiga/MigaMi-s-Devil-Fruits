@@ -10,13 +10,15 @@ public class C2SFruitMessage extends PlayMessage<C2SFruitMessage>
 {
     private int fruit;
     private int move;
+    private int amount;
 
     public C2SFruitMessage() {}
 
-    public C2SFruitMessage(int fruit, int move)
+    public C2SFruitMessage(int fruit, int move, int amount)
     {
         this.fruit = fruit;
         this.move = move;
+        this.amount = amount;
     }
 
     @Override
@@ -24,12 +26,13 @@ public class C2SFruitMessage extends PlayMessage<C2SFruitMessage>
     {
         buffer.writeInt(message.fruit);
         buffer.writeInt(message.move);
+        buffer.writeInt(message.amount);
     }
 
     @Override
     public C2SFruitMessage decode(FriendlyByteBuf buffer)
     {
-        return new C2SFruitMessage(buffer.readInt(), buffer.readInt());
+        return new C2SFruitMessage(buffer.readInt(), buffer.readInt(), buffer.readInt());
     }
 
     @Override
@@ -40,7 +43,7 @@ public class C2SFruitMessage extends PlayMessage<C2SFruitMessage>
             ServerPlayer player = context.getPlayer();
             if(player != null && !player.isSpectator())
             {
-                ServerPlayHandler.messageToFruit(player, message.fruit, message.move);
+                ServerPlayHandler.messageToFruit(player, message.fruit, message.move, message.amount);
             }
         });
         context.setHandled(true);

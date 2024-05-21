@@ -15,8 +15,6 @@ public class PacketHandler
     {
         playChannel = FrameworkAPI.createNetworkBuilder(new ResourceLocation(Reference.MOD_ID, "play"), 1)
                 .registerPlayMessage(C2SFruitMessage.class, MessageDirection.PLAY_SERVER_BOUND)
-                .registerPlayMessage(S2SFireworkFruit.class, MessageDirection.PLAY_SERVER_BOUND)
-                .registerPlayMessage(S2SCreeperFruit.class, MessageDirection.PLAY_SERVER_BOUND)
                 .build();
     }
 

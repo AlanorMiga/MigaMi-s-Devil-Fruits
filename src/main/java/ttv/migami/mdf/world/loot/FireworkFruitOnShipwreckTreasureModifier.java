@@ -30,7 +30,7 @@ public class FireworkFruitOnShipwreckTreasureModifier extends LootModifier {
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         if(context.getRandom().nextFloat() > 0.50F) { // 50% chance of the item spawning in.
-            int random = new Random().nextInt(3) + 1; // Min 1, Max 2.
+            int random = new Random().nextInt(3) + 1; // Min 1, Max 3.
             generatedLoot.add(new ItemStack(item, random));
         }
         return generatedLoot;

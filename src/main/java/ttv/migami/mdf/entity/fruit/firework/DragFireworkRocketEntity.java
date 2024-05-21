@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import ttv.migami.mdf.init.ModEffects;
 
 import java.util.*;
 
@@ -50,16 +51,18 @@ public class DragFireworkRocketEntity extends CustomFireworkRocketEntity {
             for (Entity entity : draggedEntities) {
                 if (entity instanceof Player) {
                     if (entity == this.getOwner() && this.dragsUser) {
-                        entity.startRiding(this);
+                        entity.startRiding(this, true);
+                        ((Player) entity).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, false, false));
                     }
                     else if (entity != this.getOwner()) {
-                        entity.startRiding(this);
+                        entity.startRiding(this, true);
+                        ((Player) entity).addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 60, 6, false, false));
                     }
-                    ((Player) entity).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 0, false, false));
+                    ((Player) entity).addEffect(new MobEffectInstance(ModEffects.FEATHER_FALLING.get(), 100, 0, false, false));
                 }
                 else {
                     if (entity instanceof LivingEntity) {
-                        ((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 0, false, false));
+                        ((LivingEntity) entity).addEffect(new MobEffectInstance(ModEffects.FEATHER_FALLING.get(), 100, 0, false, false));
                     }
                     entity.setDeltaMovement(this.getDeltaMovement());
                 }

@@ -5,6 +5,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -12,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import ttv.migami.mdf.DevilFruits;
+import ttv.migami.mdf.common.network.ServerPlayHandler;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -60,26 +63,42 @@ public class CustomFireworkRocketEntity extends FireworkRocketEntity {
         this.setOwner(pShooter);
     }
 
+    public CustomFireworkRocketEntity(Level pLevel, ItemStack pStack, Entity pShooter, float damage, double pX, double pY, double pZ, boolean pShotAtAngle) {
+        this(pLevel, pStack, pX, pY, pZ, pShotAtAngle);
+        this.setOwner(pShooter);
+        this.damage = damage;
+    }
+
     @Override
     public void explode() {
         this.level().broadcastEntityEvent(this, (byte)17);
         this.gameEvent(GameEvent.EXPLODE, this.getOwner());
-        this.dealExplosionDamageToOthers(this.damage);
+
+        float customDamage = this.damage;
+
+        if (this.getOwner() instanceof Player) {
+            Player owner = (Player) this.getOwner();
+            customDamage = ServerPlayHandler.calculateCustomDamage(owner, this.damage);
+        }
+        DevilFruits.LOGGER.info("Beginning loading of data for data loader: {}", customDamage);
+
+
+        this.dealExplosionDamage(customDamage);
         this.discard();
     }
 
-    public void dealExplosionDamageToOthers(float damage) {
+    public void dealExplosionDamage(float damage) {
         float explosionDamage = 0.0F;
         ItemStack itemstack = (ItemStack)this.entityData.get(DATA_ID_FIREWORKS_ITEM);
         CompoundTag compoundtag = itemstack.isEmpty() ? null : itemstack.getTagElement("Fireworks");
         ListTag listtag = compoundtag != null ? compoundtag.getList("Explosions", 10) : null;
         if (listtag != null && !listtag.isEmpty()) {
-            explosionDamage = damage + (float)(listtag.size() * 2);
+            explosionDamage = damage;
         }
 
         if (explosionDamage > 0.0F) {
             if (this.attachedToEntity != null) {
-                this.attachedToEntity.hurt(this.damageSources().fireworks(this, this.getOwner()), 5.0F + (float)(listtag.size() * 2));
+                this.attachedToEntity.hurt(this.damageSources().fireworks(this, this.getOwner()), damage);
             }
 
 
@@ -110,7 +129,7 @@ public class CustomFireworkRocketEntity extends FireworkRocketEntity {
                 }
 
                 if (flag && livingentity != this.getOwner()) {
-                    float f1 = explosionDamage * (float)Math.sqrt((damage - (double)this.distanceTo(livingentity)) / 5.0);
+                    float f1 = explosionDamage * (float)Math.sqrt((5.0D - (double)this.distanceTo(livingentity)) / 5.0D);
                     livingentity.hurt(this.damageSources().fireworks(this, this.getOwner()), f1);
                     livingentity.invulnerableTime = 0;
                 }

@@ -59,9 +59,9 @@ public class SkeletonControlParticle extends TextureSheetParticle {
       if (this.age++ >= this.lifetime) {
          this.remove();
       } else {
-         float f = (float)this.age / (float)this.lifetime;
-         float f1 = -f + f * f * 2.0F;
-         float f2 = 1.0F - f1;
+         float f = (float)this.age * 2 / (float)this.lifetime;
+         float f1 = -f + f * f * 3.0F;
+         float f2 = 0.2F - f1;
          this.x = this.xStart + this.xd * (double)f2;
          this.y = this.yStart + this.yd * (double)f2 + (double)(1.0F - f);
          this.z = this.zStart + this.zd * (double)f2;

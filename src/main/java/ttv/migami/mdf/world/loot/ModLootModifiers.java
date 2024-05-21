@@ -20,6 +20,14 @@ public class ModLootModifiers {
     public static final RegistryObject<Codec<? extends IGlobalLootModifier>> CREEPER_FRUIT_SIMPLE_DUNGEON =
             LOOT_MODIFIER_SERIALIZERS.register("creeper_fruit_on_simple_dungeon", CreeperFruitOnSimpleDungeonModifier.CODEC);
 
+    public static final RegistryObject<Codec<? extends IGlobalLootModifier>> SQUID_FRUIT_GUARDIAN =
+            LOOT_MODIFIER_SERIALIZERS.register("squid_fruit_on_guardian", SquidFruitOnGuardianModifier.CODEC);
+
+    public static final RegistryObject<Codec<? extends IGlobalLootModifier>> BUSTER_FRUIT_DESERT_PYRAMID =
+            LOOT_MODIFIER_SERIALIZERS.register("buster_fruit_on_desert_pyramid", BusterFruitOnGuardianModifier.CODEC);
+
+    public static final RegistryObject<Codec<? extends IGlobalLootModifier>> FLOWER_FRUIT_JUNGLE_TEMPLE =
+            LOOT_MODIFIER_SERIALIZERS.register("fallen_flower_on_jungle_temple", FallenFruitOnJungleTempleModifier.CODEC);
 
     public static void register(IEventBus bus) {
         LOOT_MODIFIER_SERIALIZERS.register(bus);

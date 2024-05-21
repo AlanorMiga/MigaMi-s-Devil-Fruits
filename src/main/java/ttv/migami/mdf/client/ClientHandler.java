@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import ttv.migami.mdf.Reference;
 import ttv.migami.mdf.client.handler.MovesetHandler;
+import ttv.migami.mdf.client.handler.RecoilHandler;
 import ttv.migami.mdf.init.ModItems;
 import ttv.migami.mdf.item.FruitItem;
 
@@ -25,6 +26,7 @@ public class ClientHandler {
 
     public static void setup() {
         MinecraftForge.EVENT_BUS.register(MovesetHandler.get());
+        MinecraftForge.EVENT_BUS.register(RecoilHandler.get());
     }
 
     public static void onRegisterCreativeTab(IEventBus bus)

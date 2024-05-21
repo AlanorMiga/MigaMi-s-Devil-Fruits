@@ -21,13 +21,15 @@ public class FruitGen extends FruitProvider
     @Override
     protected void registerFruits()
     {
-        /* Scrap Tier */
-        this.addFruit(new ResourceLocation(Reference.MOD_ID, "firework_blessing"), Fruit.Builder.create()
+
+        this.addFruit(new ResourceLocation(Reference.MOD_ID, "firework_fruit"), Fruit.Builder.create()
 
                 // Z-Move
-                .setDamage(5.0F)
-                .canBeHeld(false)
-                .setCooldown(100)
+                .setZMoveValues(5, true, 160, 0, 1)
+                .setXMoveValues(5, true, 200, 0, 1)
+                .setCMoveValues(5, true, 250, 5, 8)
+                .setVMoveValues(5, true, 300, 4, 24)
+                .setFMoveValues(5, false, 150, 0, 1)
 
                 .build());
 

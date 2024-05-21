@@ -1,7 +1,9 @@
 package ttv.migami.mdf;
 
 import com.mrcrayfish.framework.api.client.FrameworkClientAPI;
+import com.mrcrayfish.framework.api.event.PlayerEvents;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.HorseRenderer;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -22,9 +24,17 @@ import ttv.migami.mdf.client.KeyBinds;
 import ttv.migami.mdf.client.MetaLoader;
 import ttv.migami.mdf.datagen.FruitGen;
 import ttv.migami.mdf.datagen.WorldGen;
-import ttv.migami.mdf.entity.client.skeleton.BoneGeoRenderer;
+import ttv.migami.mdf.entity.client.StunEntityRenderer;
+import ttv.migami.mdf.entity.client.buster.CactusGeoRenderer;
+import ttv.migami.mdf.entity.client.buster.CustomLassoRenderer;
+import ttv.migami.mdf.entity.client.buster.DynamiteRenderer;
+import ttv.migami.mdf.entity.client.buster.PianoRenderer;
+import ttv.migami.mdf.entity.client.flower.*;
 import ttv.migami.mdf.entity.client.skeleton.BoneZoneGeoRenderer;
 import ttv.migami.mdf.entity.client.skeleton.GasterBlasterGeoRenderer;
+import ttv.migami.mdf.entity.client.skeleton.SmallBoneRenderer;
+import ttv.migami.mdf.entity.client.squid.InkSplatRenderer;
+import ttv.migami.mdf.event.AfterDeathHandler;
 import ttv.migami.mdf.init.*;
 import ttv.migami.mdf.network.PacketHandler;
 import ttv.migami.mdf.world.loot.ModLootModifiers;
@@ -42,6 +52,7 @@ public class DevilFruits {
         //ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(PlayerEvents.class);
         ModEffects.REGISTER.register(bus);
         ModEnchantments.REGISTER.register(bus);
         ModItems.REGISTER.register(bus);
@@ -53,6 +64,7 @@ public class DevilFruits {
         bus.addListener(this::onCommonSetup);
         bus.addListener(this::onClientSetup);
         bus.addListener(this::onGatherData);
+        MinecraftForge.EVENT_BUS.register(new AfterDeathHandler());
 
         // OooOoOh spooky!
         GeckoLib.initialize();
@@ -68,8 +80,21 @@ public class DevilFruits {
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(ClientHandler::setup);
         EntityRenderers.register(ModEntities.GASTER_BLASTER.get(), GasterBlasterGeoRenderer::new);
-        EntityRenderers.register(ModEntities.SMALL_BONE.get(), BoneGeoRenderer::new);
+        EntityRenderers.register(ModEntities.SMALL_BONE.get(), SmallBoneRenderer::new);
         EntityRenderers.register(ModEntities.BONE_ZONE.get(), BoneZoneGeoRenderer::new);
+        EntityRenderers.register(ModEntities.INK_SPLAT.get(), InkSplatRenderer::new);
+        EntityRenderers.register(ModEntities.PIANO.get(), PianoRenderer::new);
+        EntityRenderers.register(ModEntities.DYNAMITE.get(), DynamiteRenderer::new);
+        EntityRenderers.register(ModEntities.BUSTER.get(), HorseRenderer::new);
+        EntityRenderers.register(ModEntities.LASSO.get(), CustomLassoRenderer::new);
+        EntityRenderers.register(ModEntities.CACTUS.get(), CactusGeoRenderer::new);
+        EntityRenderers.register(ModEntities.FLOWER_SPEAR.get(), FlowerSpearGeoRenderer::new);
+        EntityRenderers.register(ModEntities.VINE_TRAP.get(), VineTrapGeoRenderer::new);
+        EntityRenderers.register(ModEntities.PIRANHA_PLANT.get(), PiranhaPlantGeoRenderer::new);
+        EntityRenderers.register(ModEntities.VINE.get(), VineGeoRenderer::new);
+        EntityRenderers.register(ModEntities.PETAL.get(), PetalRenderer::new);
+
+        EntityRenderers.register(ModEntities.STUN_ENTITY.get(), StunEntityRenderer::new);
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event) {
@@ -88,7 +113,4 @@ public class DevilFruits {
         generator.addProvider(event.includeServer(), new WorldGen(output, lookupProvider));
     }
 
-    public static boolean isDebugging() {
-        return false; //!FMLEnvironment.production;
-    }
 }

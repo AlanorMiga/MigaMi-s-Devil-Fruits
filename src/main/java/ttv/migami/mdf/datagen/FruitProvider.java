@@ -25,7 +25,7 @@ public abstract class FruitProvider implements DataProvider
 
     protected FruitProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries)
     {
-        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "fruit");
+        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "fruits");
         this.registries = registries;
     }
 

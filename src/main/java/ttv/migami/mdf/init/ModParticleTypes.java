@@ -15,5 +15,8 @@ public class ModParticleTypes {
 
     public static final RegistryObject<SimpleParticleType> GASTER_BLASTER_BEAM = REGISTER.register("gaster_blaster_beam", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> SKELETON_CONTROL_PARTICLE = REGISTER.register("skeleton_control", () -> new SimpleParticleType(true));
+    public static final RegistryObject<SimpleParticleType> INK_STROKE = REGISTER.register("ink_stroke", () -> new SimpleParticleType(true));
+    public static final RegistryObject<SimpleParticleType> INK_STROKE_RIGHT = REGISTER.register("ink_stroke_right", () -> new SimpleParticleType(true));
+    public static final RegistryObject<SimpleParticleType> INK_STROKE_DUAL = REGISTER.register("ink_stroke_dual", () -> new SimpleParticleType(true));
 
 }

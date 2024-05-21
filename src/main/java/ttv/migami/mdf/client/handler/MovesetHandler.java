@@ -1,19 +1,23 @@
 package ttv.migami.mdf.client.handler;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 import ttv.migami.mdf.Reference;
 import ttv.migami.mdf.client.KeyBinds;
+import ttv.migami.mdf.common.ActionType;
+import ttv.migami.mdf.common.FruitType;
+import ttv.migami.mdf.common.MoveManager;
+import ttv.migami.mdf.effect.Action;
 import ttv.migami.mdf.effect.FruitEffect;
+import ttv.migami.mdf.event.FruitFireEvent;
 import ttv.migami.mdf.init.ModEffects;
 import ttv.migami.mdf.network.PacketHandler;
 import ttv.migami.mdf.network.message.C2SFruitMessage;
@@ -25,196 +29,201 @@ public class MovesetHandler {
 
     private static MovesetHandler instance;
 
-    FruitEffect effect;
-    int fruit;
+    public FruitEffect effect;
+    private FruitType currentFruit;
+    private FruitType previousFruit;
 
-    private static int z_cooldown;
-    private static int z_interval;
-    private static int z_amount;
-    private static int x_cooldown = 0;
-    private static int x_interval = 0;
-    private static int x_amount = 0;
-    private static int c_cooldown = 0;
-    private static int c_interval = 0;
-    private static int c_amount = 0;
-    private static int v_cooldown = 0;
-    private static int v_interval = 0;
-    private static int v_amount = 0;
-    private static int f_cooldown = 0;
-    private static int f_interval = 0;
-    private static int f_amount = 0;
+    private final MoveManager moveManager = new MoveManager();
 
-    public static MovesetHandler get()
-    {
-        if(instance == null)
-        {
+    public static MovesetHandler get() {
+        if (instance == null) {
             instance = new MovesetHandler();
         }
         return instance;
     }
 
-    private MovesetHandler()
-    {
-    }
+    private MovesetHandler() {}
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event)
-    {
+    public void onClientTick(TickEvent.ClientTickEvent event) {
         Player player = Minecraft.getInstance().player;
-        if(player == null)
-            return;
+        if (player == null) return;
+
+        updateCurrentFruit(player);
+
+        if (effect != null) {
+            for (ActionType action : ActionType.values()) {
+                if (moveManager.getCooldown(action) > 0) {
+                    moveManager.decrementCooldown(action);
+                }
+                if (moveManager.getInterval(action) > 0) {
+                    moveManager.decrementInterval(action);
+                }
+                if (moveManager.getCooldown(action) == 0 && moveManager.getAmount(action) == 0) {
+                    updateActionAmount(action);
+                    notifyPlayer(action);
+                }
+            }
+        }
+    }
+
+    private void updateCurrentFruit(Player player) {
+        FruitType newFruit = null;
+        FruitEffect newEffect = null;
 
         if (player.hasEffect(ModEffects.FIREWORK_FRUIT.get())) {
-            effect = ModEffects.FIREWORK_FRUIT.get();
-            fruit = 1;
+            newEffect = ModEffects.FIREWORK_FRUIT.get();
+            newFruit = FruitType.FIREWORK_FRUIT;
+        } else if (player.hasEffect(ModEffects.CREEPER_FRUIT.get())) {
+            newEffect = ModEffects.CREEPER_FRUIT.get();
+            newFruit = FruitType.CREEPER_FRUIT;
+        } else if (player.hasEffect(ModEffects.SKELETON_FRUIT.get())) {
+            newEffect = ModEffects.SKELETON_FRUIT.get();
+            newFruit = FruitType.SKELETON_FRUIT;
+        } else if (player.hasEffect(ModEffects.SQUID_FRUIT.get())) {
+            newEffect = ModEffects.SQUID_FRUIT.get();
+            newFruit = FruitType.SQUID_FRUIT;
+        } else if (player.hasEffect(ModEffects.BUSTER_FRUIT.get())) {
+            newEffect = ModEffects.BUSTER_FRUIT.get();
+            newFruit = FruitType.BUSTER_FRUIT;
         }
-        else if (player.hasEffect(ModEffects.CREEPER_FRUIT.get())) {
-            effect = ModEffects.CREEPER_FRUIT.get();
-            fruit = 2;
-        }
-        else if (player.hasEffect(ModEffects.SKELETON_FRUIT.get())) {
-            effect = ModEffects.SKELETON_FRUIT.get();
-            fruit = 3;
-        }
-        else {
-            effect = null;
+        else if (player.hasEffect(ModEffects.FLOWER_FRUIT.get())) {
+            newEffect = ModEffects.FLOWER_FRUIT.get();
+            newFruit = FruitType.FLOWER_FRUIT;
         }
 
-        if (effect != null)
-        {
-            if (z_cooldown > 0) {
-                z_cooldown--;
-            }
-            if (z_interval > 0) {
-                z_interval--;
-            }
-            if (z_cooldown == 0 && z_amount == 0) {
-                z_amount = effect.getZAttackAmount();
-                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.z_ready", KeyBinds.KEY_Z_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
-            }
-            if (x_cooldown > 0) {
-                x_cooldown--;
-            }
-            if (x_interval > 0) {
-                x_interval--;
-            }
-            if (x_cooldown == 0 && x_amount == 0) {
-                x_amount = effect.getXAttackAmount();
-                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.x_ready", KeyBinds.KEY_X_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
-            }
-            if (c_cooldown > 0) {
-                c_cooldown--;
-            }
-            if (c_interval > 0) {
-                c_interval--;
-            }
-            if (c_cooldown == 0 && c_amount == 0) {
-                c_amount = effect.getCAttackAmount();
-                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.c_ready", KeyBinds.KEY_C_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
-            }
-            if (v_cooldown > 0) {
-                v_cooldown--;
-            }
-            if (v_interval > 0) {
-                v_interval--;
-            }
-            if (v_cooldown == 0 && v_amount == 0) {
-                v_amount = effect.getVAttackAmount();
-                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.v_ready", KeyBinds.KEY_V_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
-            }
-            if (f_cooldown > 0) {
-                f_cooldown--;
-            }
-            if (f_interval > 0) {
-                f_interval--;
-            }
-            if (f_cooldown == 0 && f_amount == 0) {
-                f_amount = effect.getFAttackAmount();
-                Minecraft.getInstance().player.sendSystemMessage(Component.translatable("info.mdf.f_ready", KeyBinds.KEY_F_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH)).withStyle(ChatFormatting.YELLOW));
+        if (newFruit != currentFruit) {
+            resetCooldownsAndAmounts();
+            previousFruit = currentFruit;
+            currentFruit = newFruit;
+            effect = newEffect;
+        }
+    }
+
+    private void resetCooldownsAndAmounts() {
+        for (ActionType action : ActionType.values()) {
+            moveManager.setCooldown(action, 100);
+            moveManager.setInterval(action, 0);
+            moveManager.setAmount(action, 0);
+        }
+    }
+
+    private void updateActionAmount(ActionType action) {
+        Action fruitAction = effect.getAction(action);
+        moveManager.setAmount(action, fruitAction.getAttackAmount());
+    }
+
+    private void notifyPlayer(ActionType action) {
+        String keyName = switch (action) {
+            case Z -> KeyBinds.KEY_Z_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH);
+            case X -> KeyBinds.KEY_X_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH);
+            case C -> KeyBinds.KEY_C_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH);
+            case V -> KeyBinds.KEY_V_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH);
+            case F -> KeyBinds.KEY_F_ACTION.getTranslatedKeyMessage().getString().toUpperCase(Locale.ENGLISH);
+        };
+    }
+
+    @SubscribeEvent
+    public void onKeyPressed(InputEvent.Key event) {
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return;
+
+        if (effect != null && player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty()) {
+            for (ActionType action : ActionType.values()) {
+                if (isActionTriggered(action, event)) {
+                    performAction(action);
+                }
+                if (isActionReleased(action, event)) {
+                    looseAmounts(action);
+                }
             }
         }
     }
 
-    @SubscribeEvent
-    public void onKeyPressed(InputEvent.Key event)
-    {
+    private boolean isActionTriggered(ActionType action, InputEvent.Key event) {
+        return switch (action) {
+            case Z -> KeyBinds.KEY_Z_ACTION.isDown() && moveManager.getCooldown(action) == 0;
+            case X -> KeyBinds.KEY_X_ACTION.isDown() && moveManager.getCooldown(action) == 0;
+            case C -> KeyBinds.KEY_C_ACTION.isDown() && moveManager.getCooldown(action) == 0;
+            case V -> KeyBinds.KEY_V_ACTION.isDown() && moveManager.getCooldown(action) == 0;
+            case F -> KeyBinds.KEY_F_ACTION.isDown() && moveManager.getCooldown(action) == 0;
+        } && (actionCanBeHeld(action) || event.getAction() == GLFW.GLFW_PRESS);
+    }
+
+    private boolean isActionReleased(ActionType action, InputEvent.Key event) {
+        return switch (action) {
+            case Z -> !KeyBinds.KEY_Z_ACTION.isDown() && moveManager.getAmount(action) != getActionAmount(action) &&
+                    moveManager.getCooldown(action) == 0;
+            case X -> !KeyBinds.KEY_X_ACTION.isDown() && moveManager.getAmount(action) != getActionAmount(action) &&
+                    moveManager.getCooldown(action) == 0;
+            case C -> !KeyBinds.KEY_C_ACTION.isDown() && moveManager.getAmount(action) != getActionAmount(action) &&
+                    moveManager.getCooldown(action) == 0;
+            case V -> !KeyBinds.KEY_V_ACTION.isDown() && moveManager.getAmount(action) != getActionAmount(action) &&
+                    moveManager.getCooldown(action) == 0;
+            case F -> !KeyBinds.KEY_F_ACTION.isDown() && moveManager.getAmount(action) != getActionAmount(action) &&
+                    moveManager.getCooldown(action) == 0;
+        } && (actionCanBeHeld(action));
+    }
+
+    private void performAction(ActionType action) {
         Player player = Minecraft.getInstance().player;
-        if(player == null)
-            return;
 
-        ItemStack stack = player.getMainHandItem();
-        ItemStack stack2 = player.getOffhandItem();
-
-        if (effect != null)
-        {
-            if (stack.isEmpty() && stack2.isEmpty()) {
-                if (KeyBinds.KEY_Z_ACTION.isDown() && z_cooldown == 0) {
-                    if (effect.getZCanBeHeld() || event.getAction() == GLFW.GLFW_PRESS) {
-                        if (z_interval == 0 && z_amount > 0) {
-                            //Minecraft.getInstance().player.sendSystemMessage(Component.literal("Used Z action!"));
-                            PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(fruit, 1));
-                            z_interval = effect.getZAttackInterval();
-                            z_amount--;
-                            //player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 20, 0, false, false));
-                        }
-                    }
-                    if (z_amount == 0) {
-                        z_cooldown = effect.getZCooldown();
-                    }
-                }
-                if (KeyBinds.KEY_X_ACTION.isDown() && x_cooldown == 0) {
-                    if (effect.getXCanBeHeld() || event.getAction() == GLFW.GLFW_PRESS) {
-                        if (x_interval == 0 && x_amount > 0) {
-                            //Minecraft.getInstance().player.sendSystemMessage(Component.literal("Used X action!"));
-                            PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(fruit, 2));
-                            x_interval = effect.getXAttackInterval();
-                            x_amount--;
-                        }
-                    }
-                    if (x_amount == 0) {
-                        x_cooldown = effect.getXCooldown();
-                    }
-                }
-                if (KeyBinds.KEY_C_ACTION.isDown() && c_cooldown == 0) {
-                    if (effect.getCCanBeHeld() || event.getAction() == GLFW.GLFW_PRESS) {
-                        if (c_interval == 0 && c_amount > 0) {
-                            //Minecraft.getInstance().player.sendSystemMessage(Component.literal("Used C action!"));
-                            PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(fruit, 3));
-                            c_interval = effect.getCAttackInterval();
-                            c_amount--;
-                        }
-                    }
-                    if (c_amount == 0) {
-                        c_cooldown = effect.getCCooldown();
-                    }
-                }
-                if (KeyBinds.KEY_V_ACTION.isDown() && v_cooldown == 0) {
-                    if (effect.getVCanBeHeld() || event.getAction() == GLFW.GLFW_PRESS) {
-                        if (v_interval == 0 && v_amount > 0) {
-                            //Minecraft.getInstance().player.sendSystemMessage(Component.literal("Used V action!"));
-                            PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(fruit, 4));
-                            v_interval = effect.getVAttackInterval();
-                            v_amount--;
-                        }
-                    }
-                    if (v_amount == 0) {
-                        v_cooldown = effect.getVCooldown();
-                    }
-                }
-                if (KeyBinds.KEY_F_ACTION.isDown() && f_cooldown == 0) {
-                    if (effect.getFCanBeHeld() || event.getAction() == GLFW.GLFW_PRESS) {
-                        if (f_interval == 0 && f_amount > 0) {
-                            //Minecraft.getInstance().player.sendSystemMessage(Component.literal("Used F action!"));
-                            PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(fruit, 5));
-                            f_interval = effect.getFAttackInterval();
-                            f_amount--;
-                        }
-                    }
-                    if (f_amount == 0) {
-                        f_cooldown = effect.getFCooldown();
-                    }
-                }
-            }
+        if (moveManager.getInterval(action) == 0 && moveManager.getAmount(action) > 0) {
+            PacketHandler.getPlayChannel().sendToServer(new C2SFruitMessage(currentFruit.ordinal() + 1, action.ordinal() + 1, moveManager.getAmount(action)));
+            moveManager.setInterval(action, getActionInterval(action));
+            moveManager.setAmount(action, moveManager.getAmount(action) - 1);
         }
+        if (moveManager.getAmount(action) == 0) {
+            moveManager.setCooldown(action, getActionCooldown(action));
+        }
+
+        if (hasRecoil(action)) {
+            if(MinecraftForge.EVENT_BUS.post(new FruitFireEvent.Pre(player, getRecoilKick(action))))
+                return;
+            MinecraftForge.EVENT_BUS.post(new FruitFireEvent.Post(player, getRecoilKick(action)));
+        }
+    }
+
+    private void looseAmounts(ActionType action) {
+        if (moveManager.getAmount(action) != 0) {
+            moveManager.setAmount(action, 0);
+            moveManager.setCooldown(action, getActionCooldown(action));
+        }
+    }
+
+    public int getActionAmount(ActionType action) {
+        return effect.getAction(action).getAttackAmount();
+    }
+
+    private int getActionInterval(ActionType action) {
+        return effect.getAction(action).getAttackInterval();
+    }
+
+    private boolean actionCanBeHeld(ActionType action) {
+        return effect.getAction(action).canBeHeld();
+    }
+
+    public int getActionCooldown(ActionType action) {
+        return effect.getAction(action).getCooldown();
+    }
+
+    public MutableComponent getActionName(ActionType action) {
+        return effect.getAction(action).getName();
+    }
+
+    public boolean isDisabled(ActionType action) {
+        return effect.getAction(action).isDisabled();
+    }
+
+    public boolean hasRecoil(ActionType action) {
+        return effect.getAction(action).hasRecoil();
+    }
+
+    public float getRecoilKick(ActionType action) {
+        return effect.getAction(action).getRecoilKick();
+    }
+
+    public MoveManager getCooldownManager() {
+        return moveManager;
     }
 }

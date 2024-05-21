@@ -34,8 +34,8 @@ public class SmallBoneRenderer extends EntityRenderer<Bone> {
         pPoseStack.mulPose(Axis.YP.rotationDegrees(180F));
         pPoseStack.mulPose(Axis.YP.rotationDegrees(pEntityYaw));
         pPoseStack.mulPose(Axis.XP.rotationDegrees(pEntity.getXRot()));
-        pPoseStack.scale(1, -1, 1);
-        pPoseStack.translate(0.0D, -1.700D, 0.0D);
+        //pPoseStack.scale(1, -1, 1);
+        pPoseStack.translate(0.0D, -1.500D, 0.0D);
         VertexConsumer vertexconsumer = pBuffer.getBuffer(this.model.renderType(TEXTURE_LOCATION));
         this.model.renderToBuffer(pPoseStack, vertexconsumer, pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 

@@ -1,6 +1,7 @@
 package ttv.migami.mdf.entity.fruit.skeleton;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -27,6 +28,8 @@ import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
+import ttv.migami.mdf.common.network.ServerPlayHandler;
+import ttv.migami.mdf.entity.SummonEntity;
 import ttv.migami.mdf.init.ModEntities;
 import ttv.migami.mdf.init.ModParticleTypes;
 import ttv.migami.mdf.init.ModSounds;
@@ -34,7 +37,7 @@ import ttv.migami.mdf.init.ModSounds;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
+public class GasterBlaster extends SummonEntity implements TraceableEntity, GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private int warmupDelayTicks;
     private boolean shot = false;
@@ -48,6 +51,7 @@ public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
     @Nullable
     private Entity targetEntity;
     private float damage = 4.0F;
+    private float customDamage = damage;
 
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(GasterBlaster.class, EntityDataSerializers.BOOLEAN);
@@ -67,6 +71,13 @@ public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
         this.setPos(pPos);
         this.target = pTarget;
         this.setOwner(pPlayer);
+        this.noPhysics = true;
+        this.lookAt(EntityAnchorArgument.Anchor.EYES, pTarget);
+
+        if (this.getOwner() instanceof Player) {
+            Player owner = (Player) this.getOwner();
+            this.customDamage = ServerPlayHandler.calculateCustomDamage(owner, this.damage) / 2;
+        }
     }
 
     public GasterBlaster(Level pLevel, Player pPlayer, Vec3 pPos, Entity pEntity) {
@@ -74,6 +85,13 @@ public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
         this.setPos(pPos);
         this.targetEntity = pEntity;
         this.setOwner(pPlayer);
+        this.noPhysics = true;
+        this.lookAt(EntityAnchorArgument.Anchor.EYES, pEntity.getPosition(1F));
+
+        if (this.getOwner() instanceof Player) {
+            Player owner = (Player) this.getOwner();
+            this.customDamage = ServerPlayHandler.calculateCustomDamage(owner, this.damage) / 2;
+        }
     }
 
     public void setTarget(@Nullable Vec3 pTarget) {
@@ -155,7 +173,22 @@ public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
                 --this.lifeTicks;
                 if (this.warmupDelayTicks == -1) {
                     this.setJustSpawned(true);
+
                     level.playSound(this, this.blockPosition(), ModSounds.GASTER_BLASTER_PRIME.get(), SoundSource.PLAYERS, 1.33F, 1F);
+
+                    HitResult result = this.pick(48, 0, false);
+                    Vec3 eyePos = this.getEyePosition().add(0, -0.75, 0);
+                    Vec3 targetPos = result.getLocation();
+                    if (this.target != null) {
+                        targetPos = this.getTargetPos();
+                    }
+                    Vec3 distanceTo = targetPos.subtract(eyePos);
+                    Vec3 normal = distanceTo.normalize();
+
+                    for(int i = 1; i < Mth.floor(distanceTo.length()) + 7; ++i) {
+                        Vec3 eyeVec3 = eyePos.add(normal.scale((double)i));
+                        ((ServerLevel) level).sendParticles(ModParticleTypes.SKELETON_CONTROL_PARTICLE.get(), eyeVec3.x, eyeVec3.y, eyeVec3.z, 10, 0.3D, 0.3D, 0.3D, 3.0D);
+                    }
                 }
                 if (this.warmupDelayTicks == -12) {
                     if (!this.shot) {
@@ -194,21 +227,32 @@ public class GasterBlaster extends Mob implements TraceableEntity, GeoEntity {
             Vec3 eyeVec3 = eyePos.add(normal.scale((double)i));
             if (this.targetEntity != null) {
                 ((ServerLevel) level).sendParticles(ModParticleTypes.GASTER_BLASTER_BEAM.get(), eyeVec3.x, eyeVec3.y + 1, eyeVec3.z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                ((ServerLevel) level).sendParticles(ParticleTypes.FIREWORK, eyeVec3.x, eyeVec3.y + 1, eyeVec3.z, 5, 0.0D, 0.0D, 0.0D, 0.1D);
             }
             else {
                 ((ServerLevel) level).sendParticles(ModParticleTypes.GASTER_BLASTER_BEAM.get(), eyeVec3.x, eyeVec3.y, eyeVec3.z, 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                ((ServerLevel) level).sendParticles(ParticleTypes.FIREWORK, eyeVec3.x, eyeVec3.y, eyeVec3.z, 5, 0.0D, 0.0D, 0.0D, 0.1D);
             }
         }
 
         EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(level, this, eyePos, targetPos, new AABB(eyePos, targetPos), this::canDamage);
 
-        if(entityHitResult != null &&
+        if (this.targetEntity != null) {
+            LivingEntity livingTargetEntity;
+            this.targetEntity.hurt(owner.damageSources().sonicBoom(owner), this.customDamage);
+            if (this.targetEntity instanceof LivingEntity) {
+                livingTargetEntity = (LivingEntity) this.targetEntity;
+                double d1 = 0.5D * (1.0D - livingTargetEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
+                double d0 = 2.5D * (1.0D - livingTargetEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
+                livingTargetEntity.push(normal.x() * d0, normal.y() * d1, normal.z() * d0);
+                livingTargetEntity.invulnerableTime = 0;
+            }
+        }
+        else if(entityHitResult != null &&
                 entityHitResult.getEntity() instanceof LivingEntity entity &&
-                owner != null &&
-                entity != owner &&
-                !(entity instanceof GasterBlaster)) {
+                owner != null && entity != owner && !(entity instanceof GasterBlaster)) {
 
-            entity.hurt(owner.damageSources().sonicBoom(owner), this.damage);
+            entity.hurt(owner.damageSources().sonicBoom(owner), this.customDamage);
             double d1 = 0.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             double d0 = 2.5D * (1.0D - entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             entity.push(normal.x() * d0, normal.y() * d1, normal.z() * d0);
