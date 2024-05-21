@@ -13,6 +13,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -31,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static ttv.migami.mdf.common.network.ServerPlayHandler.calculateCustomDamage;
 
 public class Cactus extends Entity implements GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -119,7 +122,7 @@ public class Cactus extends Entity implements GeoEntity {
                     if (entity instanceof LivingEntity && entity != owner) {
                         entity.startRiding(this, true);
                         if (!hasBeenDamaged(entity)) {
-                            entity.hurt(this.damageSources().cactus(), 6);
+                            entity.hurt(this.damageSources().cactus(), calculateCustomDamage((Player) owner, 3F));
                             entity.invulnerableTime = 0;
                             ((ServerLevel) level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, entity.getX(), entity.getY(), entity.getZ(), 6, 0.3, entity.getBbHeight(), 0.3, 0.2);
                         }
